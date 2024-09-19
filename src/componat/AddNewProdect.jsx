@@ -45,9 +45,12 @@ const AddNewProdect = () => {
             let data = snapshot.val();
             console.log(data);
             if (ProdectId === "") {
-                setProdectId(1)
+                setProdectId(0)
             } else {
                 setProdectId(snapshot.val().length)
+                if (ProdectId === undefined) {
+                    setProdectId(0)
+                }
             }
         });
     },[db , ProdectId])
