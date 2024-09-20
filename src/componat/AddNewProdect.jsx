@@ -52,8 +52,8 @@ const AddNewProdect = () => {
           ProdectId : ProdectId,
           thumbnail:{
             productimg: Thum1,
-            productimg: Thum2,
-            productimg: Thum3,
+            productimg2: Thum2,
+            productimg3: Thum3,
           }
       });
       setUrl('')
