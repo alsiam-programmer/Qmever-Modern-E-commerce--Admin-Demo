@@ -38,6 +38,7 @@ const AddNewProdect = () => {
             description: description,
             ProdectId : ProdectId,
         });
+        setUrl('')
     }
     useEffect(() => {
         const starCountRef = ref(db, 'products/');
@@ -57,14 +58,14 @@ const AddNewProdect = () => {
     
     return (
         <section>
-            <div className="container mx-auto">
+            <div className="container mx-auto px-[10px]">
                 <div className="inputBox w-[100%] md:w-[50%]">
                     <input className='w-[100%] px-[20px] outline-none border-[#000] border-[2px] mt-[10px] h-[40px]' onChange={handleName} type="text" placeholder='Name' />
                     <input className='w-[100%] px-[20px] outline-none border-[#000] border-[2px] mt-[10px] h-[40px]' onChange={handleUrl} type="text" placeholder='img URL' />
                     <input className='w-[100%] px-[20px] outline-none border-[#000] border-[2px] mt-[10px] h-[40px]' onChange={handlePrice} type="text" placeholder='price' />
                     <input className='w-[100%] px-[20px] outline-none border-[#000] border-[2px] mt-[10px] h-[40px]' onChange={handlecate} type="text" placeholder='category' />
                     <textarea onChange={handledescription} className='w-[100%] px-[20px] outline-none border-[#000] border-[2px] mt-[10px] h-[200px]' ></textarea>
-                    <h2 className=' cursor-pointer' onClick={submit} >send</h2>
+                    <h2 className=' cursor-pointer px-[20px] py-[5px] bg-[#08e008] flex justify-center text-[#fff] w-[100px]' onClick={submit} >send</h2>
                 </div>
             </div>
         </section>
