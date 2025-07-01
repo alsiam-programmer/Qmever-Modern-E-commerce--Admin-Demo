@@ -19,7 +19,19 @@ const Orders = () => {
     let [status, setStatus] = useState('')
     let [Loading, setLoading] = useState(false)
 
+    console.log(data);
     
+    const oR_status = [
+        { "id": "0", "status": "Processing" },
+        { "id": "1", "status": "Confirmed" },
+        { "id": "2", "status": "Picking" },
+        { "id": "3", "status": "Shipped" },
+        { "id": "4", "status": "Delivered" },
+        { "id": "5", "status": "Cancelled" },
+    ]
+    
+    
+
     const orders_data = async () => {
         setLoading(true);
         try {
@@ -38,7 +50,6 @@ const Orders = () => {
     };
     
     useEffect(() => {
-        datas(); // Ensure `datas` is defined and necessary
         try {
             if (data.length > 0) {
                 setLoading(false); 
@@ -84,7 +95,7 @@ const Orders = () => {
                 setStatus('')
             })
         } else {
-            console.log("fuck");
+            console.log("error");
 
         }
     }
@@ -96,21 +107,21 @@ const Orders = () => {
         setStatus(citem.status)
     }
 
+
+
+
     let datas = () => {
-        const find_sub_status = data.filter((item) => item?.orderStatus?.orderStatus === (status !== "" ? status : "Processing"))
+        
+        const find_sub_status = data.filter((item) => item?.orderStatus?.orderStatus === status )
         setsub_status(find_sub_status)
         
     }
 
 
-    const oR_status = [
-        { "id": "0", "status": "Processing" },
-        { "id": "1", "status": "Confirmed" },
-        { "id": "2", "status": "Picking" },
-        { "id": "3", "status": "Shipped" },
-        { "id": "4", "status": "Delivered" },
-        { "id": "5", "status": "Cancelled" },
-    ]
+    useEffect(()=>{
+        datas()
+    },[status])
+
     return (
         <div className="Order_box w-[100%]">
             <div className=" flex justify-between mb-[20px] ">

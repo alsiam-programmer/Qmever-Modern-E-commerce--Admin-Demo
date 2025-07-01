@@ -15,13 +15,13 @@ const OrdersApiD = ({children}) => {
       let res = await axios.get('https://qmever-default-rtdb.asia-southeast1.firebasedatabase.app/orders.json')
       if (res?.data) {
         let system = Object.values(res.data).flat().filter( item => item !== null )
-        setInfo(system);
         console.log(system);
         
+        setInfo(system);
       }
 
     } catch (error) {
-      console.log("fuck" , error);
+      console.log(error);
       
     }
     

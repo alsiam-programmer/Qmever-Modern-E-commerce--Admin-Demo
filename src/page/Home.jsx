@@ -30,7 +30,7 @@ const Home = () => {
     S_E_system()
   },[data])
   
-  console.log(items);
+  // console.log(items);
   
 
   return (
