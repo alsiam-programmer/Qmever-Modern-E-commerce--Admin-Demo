@@ -15,7 +15,6 @@ const OrdersApiD = ({children}) => {
       let res = await axios.get('https://qmever-default-rtdb.asia-southeast1.firebasedatabase.app/orders.json')
       if (res?.data) {
         let system = Object.values(res.data).flat().filter( item => item !== null )
-        console.log(system);
         
         setInfo(system);
       }

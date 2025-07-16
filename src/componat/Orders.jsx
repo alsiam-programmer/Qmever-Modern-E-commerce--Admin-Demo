@@ -18,8 +18,6 @@ const Orders = () => {
     let [sub_status, setsub_status] = useState([])
     let [status, setStatus] = useState('')
     let [Loading, setLoading] = useState(false)
-
-    console.log(data);
     
     const oR_status = [
         { "id": "0", "status": "Processing" },
@@ -75,11 +73,11 @@ const Orders = () => {
 
     useEffect(() => {
         let handlestatus = (e) => {
-            if (statusRef.current.contains(e.target) !== false) {
-                setorderStatus_on_Of(statusRef.current.contains(e.target))
-            } else {
-                setorderStatus_on_Of(statusRef.current.contains(e.target))
-            }
+           if (statusRef.current && statusRef.current.contains(e.target)) {
+  setorderStatus_on_Of(true);
+} else {
+  setorderStatus_on_Of(false);
+}
         }
         document.addEventListener('click', handlestatus)
         return () => document.removeEventListener('click', handlestatus)
@@ -124,10 +122,13 @@ const Orders = () => {
 
     return (
         <div className="Order_box w-[100%]">
-            <div className=" flex justify-between mb-[20px] ">
+            <div className=" flex flex-wrap justify-between ">
                 {oR_status.map((item, index) => (
-                    <h5 onClick={() => handlesubItem(item)} className={` ${item.id !== "5" ? "" : "bg-[red]"} cursor-pointer px-[20px] py-[4px] text-[#fff] bg-[#000] rounded`} >{item.status}</h5>
-                ))}
+  <h5 key={item.id} onClick={() => handlesubItem(item)} className={` ${item.id !== "5" ? "" : "bg-[red]"} mb-1 cursor-pointer px-[20px] py-[4px] text-[#fff] bg-[#000] rounded`}>
+    {item.status}
+  </h5>
+))}
+
             </div>
             {
                 Loading && (
@@ -136,7 +137,7 @@ const Orders = () => {
                 )
             }
             {sub_status.map((item, index) => (
-                <div className=" w-[100%] ">
+                <div key={item.orderId || index} className=" w-[100%] ">
 
                     <div onClick={() => handleOrders({ item, index })} className="header_Order py-[10px] border-[2px] border-[#000] rounded-[10px] my-[10px] cursor-pointer px-[10px] flex justify-between w-[100%] ">
                         <h5 className='text-[18px] text-[green] font-[700]' >Order Id : <span className='font-[600] text-[#ff00c8]' >{item.orderId}</span> </h5>
