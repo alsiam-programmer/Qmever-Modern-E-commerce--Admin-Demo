@@ -1,370 +1,383 @@
-import React, { useEffect, useState } from 'react';
-import { getDatabase, ref, set, onValue } from "firebase/database";
-import { FaImage } from "react-icons/fa";
-import { SketchPicker } from 'react-color'
-import { useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { getDatabase, ref, set, push } from "firebase/database";
+import { SketchPicker } from 'react-color';
 import { CiCircleRemove } from "react-icons/ci";
 import { MdDeleteForever } from "react-icons/md";
 
-const AddNewProdect = () => {
+const AddNewProduct = () => {
   const db = getDatabase();
-  const pickerRef = useRef(null)
+  const pickerRef = useRef(null);
+
+  // --- States ---
   const [Url, setUrl] = useState('');
-  const [Thum1, setthum1] = useState('');
-  const [Thum2, setthum2] = useState('');
-  const [Thum3, setthum3] = useState('');
-  const [name, setname] = useState('');
+  const [Thum1, setThum1] = useState('');
+  const [Thum2, setThum2] = useState('');
+  const [Thum3, setThum3] = useState('');
+  const [name, setName] = useState('');
   const [Mainx_category, setMainx_category] = useState('');
-  const [subx_category, setsubx_category] = useState('');
-  const [subsx_category, setsubsx_category] = useState('');
+  const [subx_category, setSubx_category] = useState('');
+  const [subsx_category, setSubsx_category] = useState('');
   const [Mainx_category_value, setMainx_category_value] = useState('');
-  const [subx_category_value, setsubx_category_value] = useState('');
+  const [subx_category_value, setSubx_category_value] = useState('');
   const [subsx_category_value, setsubsx_category_value] = useState('');
   const [VideoURL, setVideoURL] = useState('');
   const [ModelName, setModelName] = useState('');
   const [ModleItem, setModleItem] = useState('');
-  const [Modles, setModles] = useState([]);
-  const [description, setdescription] = useState('');
+  const [addModle, setModles] = useState([]);
+  const [description, setDescription] = useState('');
   const [Price, setPrice] = useState('');
-  const [ProdectId, setProdectId] = useState('');
-  const [subPrice, setsubPrice] = useState('');
-  const [Colours, setColours] = useState([
-    {Color : '' , Stock : '' }
-  ])
-  const [activeIndex, setActiveIndex] = useState(null); // Tracks which picker is open
+  const [subPrice, setSubPrice] = useState('');
+  const [Colours, setColours] = useState([{ Color: '', Stock: '' }]);
+  const [activeIndex, setActiveIndex] = useState(null);
+
+  
+
+  // --- Category Data ---
+const Main_category = [
+  { id: "0", name: "Electronics" },
+  { id: "1", name: "Fashion" },
+  { id: "2", name: "Health & Beauty" },
+  { id: "3", name: "Home & Living" },
+  { id: "4", name: "Food & Beverages" },
+  { id: "5", name: "Sports & Outdoors" },
+  { id: "6", name: "Toys & Kids" },
+  { id: "7", name: "Automotive" },
+  { id: "8", name: "Books & Stationery" },
+  { id: "9", name: "Jewelry & Accessories" },
+];
+
+const sub_category = [
+  // Electronics
+  { id: "0", Main_C_id: "0", name: "Mobiles & Tablets" },
+  { id: "1", Main_C_id: "0", name: "Computers & Laptops" },
+  { id: "2", Main_C_id: "0", name: "TV & Appliances" },
+  { id: "3", Main_C_id: "0", name: "Cameras & Gadgets" },
+
+  // Fashion
+  { id: "4", Main_C_id: "1", name: "Men" },
+  { id: "5", Main_C_id: "1", name: "Women" },
+  { id: "6", Main_C_id: "1", name: "Kids" },
+  { id: "7", Main_C_id: "1", name: "Footwear" },
+
+  // Health & Beauty
+  { id: "8", Main_C_id: "2", name: "Skincare" },
+  { id: "9", Main_C_id: "2", name: "Makeup" },
+  { id: "10", Main_C_id: "2", name: "Personal Care" },
+  { id: "11", Main_C_id: "2", name: "Medical Supplies" },
+
+  // Home & Living
+  { id: "12", Main_C_id: "3", name: "Furniture" },
+  { id: "13", Main_C_id: "3", name: "Home Decor" },
+  { id: "14", Main_C_id: "3", name: "Kitchen" },
+  { id: "15", Main_C_id: "3", name: "Appliances" },
+
+  // Food & Beverages
+  { id: "16", Main_C_id: "4", name: "Fruits & Vegetables" },
+  { id: "17", Main_C_id: "4", name: "Snacks" },
+  { id: "18", Main_C_id: "4", name: "Beverages" },
+  { id: "19", Main_C_id: "4", name: "Dairy & Bakery" },
+
+  // Sports & Outdoors
+  { id: "20", Main_C_id: "5", name: "Fitness" },
+  { id: "21", Main_C_id: "5", name: "Sports Equipment" },
+  { id: "22", Main_C_id: "5", name: "Outdoor Gear" },
+
+  // Toys & Kids
+  { id: "23", Main_C_id: "6", name: "Toys" },
+  { id: "24", Main_C_id: "6", name: "Baby Care" },
+  { id: "25", Main_C_id: "6", name: "Clothing" },
+
+  // Automotive
+  { id: "26", Main_C_id: "7", name: "Car Accessories" },
+  { id: "27", Main_C_id: "7", name: "Motorbike Accessories" },
+  { id: "28", Main_C_id: "7", name: "Spare Parts" },
+
+  // Books & Stationery
+  { id: "29", Main_C_id: "8", name: "Books" },
+  { id: "30", Main_C_id: "8", name: "Office Supplies" },
+  { id: "31", Main_C_id: "8", name: "Art & Crafts" },
+
+  // Jewelry & Accessories
+  { id: "32", Main_C_id: "9", name: "Necklaces" },
+  { id: "33", Main_C_id: "9", name: "Earrings" },
+  { id: "34", Main_C_id: "9", name: "Rings" },
+  { id: "35", Main_C_id: "9", name: "Watches" },
+];
+
+const subs_category = [
+  // Mobiles & Tablets
+  { id: "0", sub_C_id: "0", name: "Smartphones" },
+  { id: "1", sub_C_id: "0", name: "Tablets" },
+  { id: "2", sub_C_id: "0", name: "Mobile Accessories" },
+
+  // Computers
+  { id: "3", sub_C_id: "1", name: "Laptops" },
+  { id: "4", sub_C_id: "1", name: "Desktops" },
+  { id: "5", sub_C_id: "1", name: "Computer Accessories" },
+
+  // Men Fashion
+  { id: "6", sub_C_id: "4", name: "T-Shirts" },
+  { id: "7", sub_C_id: "4", name: "Shirts" },
+  { id: "8", sub_C_id: "4", name: "Jeans" },
+  { id: "9", sub_C_id: "4", name: "Jackets" },
+  { id: "27", sub_C_id: "4", name: "Wallets" },
 
 
-  const Main_category = [
-    { id: "0", name: "Health" },
-    { id: "1", name: "Dress" },
-    { id: "2", name: "Food/Vegetables" },
-    { id: "3", name: "Jewelry" },
-    { id: "4", name: "Electronics" },
-  ];
+  // Women Fashion
+  { id: "10", sub_C_id: "5", name: "Saree" },
+  { id: "11", sub_C_id: "5", name: "Kurti" },
+  { id: "12", sub_C_id: "5", name: "Western Wear" },
+  { id: "13", sub_C_id: "5", name: "Handbags" },
 
-  const sub_category = [
-    { id: "0", Main_C_id: "1", name: "Man" },
-    { id: "1", Main_C_id: "1", name: "Woman" },
-    { id: "2", Main_C_id: "1", name: "Child" },
-    { id: "3", Main_C_id: "2", name: "Vegetables" },
-  ];
+  // Fruits & Vegetables
+  { id: "14", sub_C_id: "16", name: "Vegetables" },
+  { id: "15", sub_C_id: "16", name: "Fruits" },
+  { id: "16", sub_C_id: "16", name: "Herbs" },
 
-  const subs_category = [
-    { id: "0", sub_C_id: "0", name: "T-shirt" },
-    { id: "1", sub_C_id: "0", name: "Shirt" },
-    { id: "2", sub_C_id: "1", name: "Saree" },
-    { id: "3", sub_C_id: "1", name: "Three Piece" },
-    { id: "4", sub_C_id: "3", name: "Chili" },
-    { id: "5", sub_C_id: "0", name: "Jacket" },
-  ];
+  // Snacks
+  { id: "17", sub_C_id: "17", name: "Chips" },
+  { id: "18", sub_C_id: "17", name: "Biscuits" },
+  { id: "19", sub_C_id: "17", name: "Nuts" },
 
-  const handleAddModle = () => {
-    if (ModleItem) {
-      setModles(prev => [...prev, { Model: ModleItem , Price: subPrice ? subPrice : "", NeedValue : Colours }]);
-      setModleItem('');
-      setsubPrice('');
-      setColours([])
-    }
+  // Toys
+  { id: "20", sub_C_id: "23", name: "Educational Toys" },
+  { id: "21", sub_C_id: "23", name: "Soft Toys" },
+  { id: "22", sub_C_id: "23", name: "Action Figures" },
+
+  // Jewelry
+  { id: "23", sub_C_id: "32", name: "Gold Necklaces" },
+  { id: "24", sub_C_id: "32", name: "Silver Necklaces" },
+  { id: "25", sub_C_id: "34", name: "Engagement Rings" },
+  { id: "26", sub_C_id: "35", name: "Smart Watches" },
+];
+
+  // --- Color & Stock Handlers ---
+  const addSubColour = () => setColours([...Colours, { Color: "", Stock: "" }]);
+  const handleColorChange = (color, index) => {
+    const update = [...Colours];
+    update[index].Color = color;
+    setColours(update);
+  };
+  const handleStockChange = (stock, index) => {
+    const update = [...Colours];
+    update[index].Stock = stock;
+    setColours(update);
+  };
+  const removeColour = (index) => {
+    const update = [...Colours];
+    update.splice(index, 1);
+    setColours(update);
   };
 
-  const submit = () => {
-    set(ref(db, 'products/' + ProdectId), {
-      PCU: name.slice(0, 2) + (ProdectId + 1).toString(),
+  // --- Model Handlers ---
+  const addModel = () => {
+    let NeedValue = Colours
+    if (ModleItem) {
+      setModles(prev => [...prev, { Model: ModleItem, Price: subPrice || "",  NeedValue }]);
+      setModleItem('');
+      setSubPrice('');
+      setColours([{ Color: '', Stock: '' }]);
+    }
+  };
+  const removeModel = (index) => {
+    const update = [...Modles];
+    update.splice(index, 1);
+    setModles(update);
+  };
+
+  // --- Firebase Submit ---
+  const submitProduct = () => {
+    if (!name || !Price || !Url) return alert("Product name, price and main image required");
+
+    const newRef = push(ref(db, 'products'));
+    const uid = newRef.key;
+
+    const thumbnail = {}
+
+    if(Thum1) thumbnail.productimg = Thum1;
+    if(Thum2) thumbnail.productimg2 = Thum2;
+    if(Thum3) thumbnail.productimg3 = Thum3;
+
+    set(newRef, {
       Prodectname: name,
       imgurl: Url,
-      Price: Price,
-      category: {
-        main: Mainx_category_value,
-        sub: subx_category_value,
-        subs: subsx_category_value,
-      },
-      description: description,
-      ProdectId: ProdectId,
-      ModelName: ModelName,
-      VideoURL: VideoURL,
-      addModle: Modles,
-      thumbnail: {
-        productimg: Thum1,
-        productimg2: Thum2,
-        productimg3: Thum3,
-      }
+      Price,
+      category: { main: Mainx_category_value, sub: subx_category_value, subs: subsx_category_value },
+      description,
+      uid,
+      ModelName,
+      VideoURL,
+      addModle,
     }).then(() => {
-      setUrl(''); setname(''); setdescription(''); setthum1(''); setthum2(''); setthum3('');
+      // Reset
+      alert('send')
+      setUrl(''); setName(''); setDescription('');
+      setThum1(''); setThum2(''); setThum3('');
       setPrice(''); setModles([]); setModleItem(''); setVideoURL('');
-      setMainx_category(''); setsubx_category(''); setsubsx_category('');
+      setMainx_category(''); setSubx_category(''); setsubsx_category('');
       setMainx_category_value(''); setsubx_category_value(''); setsubsx_category_value('');
+      setColours([{ Color: '', Stock: '' }]);
     });
   };
 
+  // --- Close color picker on click outside ---
   useEffect(() => {
-    const starCountRef = ref(db, 'products/');
-    onValue(starCountRef, (snapshot) => {
-      const data = snapshot.val();
-      setProdectId(data ? Object.keys(data).length : 0);
-    });
+    const handleClickOutside = (e) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target)) setActiveIndex(null);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-
-  let AddSubColour = () => {
-    setColours([...Colours , {Color : "" , Stock : "" }])
-  }
-
-  let ColVal = (item, index) => {
-    let update = [...Colours]
-    update[index].Color = item
-    setColours(update)
-  }
-
-  let HandleStock = ( item , index ) => {
-    let update = [...Colours]
-    update[index].Stock = item
-    setColours(update)
-  }
-
-  useEffect(() => {
-    function handleClickOutSide(event) {
-      if (
-        pickerRef.current && !pickerRef.current.contains(event.target)
-      ) {
-        setActiveIndex(null)
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutSide)
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutSide)
-    }
-
-
-  }, [])
-  
-  const ModlesRemove = (index) => {
-    const updatedModles = [...Modles]
-    updatedModles.splice(index , 1)
-    setModles(updatedModles)
-  }
-
-  const handleColorRemove = (index) => {
-    const updatedColours = [...Colours]
-    updatedColours.splice(index, 1);
-    setColours(updatedColours)
-  }
-
   return (
-<div className="p-6 max-w-5xl mx-auto space-y-6 bg-white shadow rounded-xl">
-  <h2 className="text-2xl font-bold">Add New Product</h2>
+<div className="p-8 w-[95%] max-w-6xl min-h-screen mx-auto space-y-8 bg-gradient-to-br from-gray-50 to-white shadow-xl rounded-2xl">
+  {/* Title */}
+  <h2 className="text-3xl font-extrabold text-gray-800 tracking-tight text-center">
+    ➕ Add New Product
+  </h2>
 
-  {/* Main Image URL input */}
-  <div>
-    <label className="block mb-1 font-semibold">Main Image URL</label>
+  {/* Main Image */}
+  <div className="bg-white p-6 rounded-xl shadow-md space-y-3">
+    <h3 className="text-lg font-semibold text-gray-700">Main Image</h3>
     <input
       type="text"
       placeholder="Paste main image URL"
-      className="border p-2 rounded w-full"
+      className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
       value={Url}
-      onChange={(e) => setUrl(e.target.value)}
+      onChange={e => setUrl(e.target.value)}
     />
-    {Url && <img src={Url} alt="Main" className="mt-2 h-32 rounded" />}
+    {Url && <img src={Url} alt="Main" className="mt-3 h-40 rounded-lg shadow-sm object-cover" />}
   </div>
-  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-    <div>
-      <label className="block mb-1 font-semibold">Thumbnail 1 URL</label>
-      <input
-        type="text"
-        placeholder="Paste thumbnail 1 URL"
-        className="border p-2 rounded w-full"
-        value={Thum1}
-        onChange={(e) => setthum1(e.target.value)}
-      />
-      {Thum1 && <img src={Thum1} className="mt-2 h-32 rounded" />}
-    </div>
-    <div>
-      <label className="block mb-1 font-semibold">Thumbnail 2 URL</label>
-      <input
-        type="text"
-        placeholder="Paste thumbnail 2 URL"
-        className="border p-2 rounded w-full"
-        value={Thum2}
-        onChange={(e) => setthum2(e.target.value)}
-      />
-      {Thum2 && <img src={Thum2} className="mt-2 h-32 rounded" />}
-    </div>
-    <div>
-      <label className="block mb-1 font-semibold">Thumbnail 3 URL</label>
-      <input
-        type="text"
-        placeholder="Paste thumbnail 3 URL"
-        className="border p-2 rounded w-full"
-        value={Thum3}
-        onChange={(e) => setthum3(e.target.value)}
-      />
-      {Thum3 && <img src={Thum3} className="mt-2 h-32 rounded" />}
+
+  {/* Thumbnails */}
+  <div className="bg-white p-6 rounded-xl shadow-md">
+    <h3 className="text-lg font-semibold text-gray-700 mb-4">Thumbnails</h3>
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      {[Thum1, Thum2, Thum3].map((thumb, idx) => (
+        <div key={idx} className="space-y-2">
+          <label className="text-sm font-medium text-gray-600">
+            Thumbnail {idx + 1}
+          </label>
+          <input
+            type="text"
+            placeholder="Image URL"
+            className="border border-gray-300 p-2 rounded-lg w-full focus:ring-2 focus:ring-blue-400"
+            value={thumb}
+            onChange={e =>
+              idx === 0
+                ? setThum1(e.target.value)
+                : idx === 1
+                ? setThum2(e.target.value)
+                : setThum3(e.target.value)
+            }
+          />
+          {thumb && (
+            <img
+              src={thumb}
+              alt={`thumb${idx}`}
+              className="mt-2 h-28 rounded-lg object-cover shadow-sm"
+            />
+          )}
+        </div>
+      ))}
     </div>
   </div>
 
   {/* Product Info */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <input
-      className="border p-2 rounded"
-      placeholder="Product Name"
-      value={name}
-      onChange={(e) => setname(e.target.value)}
-    />
-    <input
-      className="border p-2 rounded"
-      placeholder="Price"
-      value={Price}
-      onChange={(e) => setPrice(e.target.value)}
-    />
-    <input
-      className="border p-2 rounded"
-      placeholder="Video URL"
-      value={VideoURL}
-      onChange={(e) => setVideoURL(e.target.value)}
-    />
-    <input
-      className="border p-2 rounded"
-      placeholder="Model Name"
-      value={ModelName}
-      onChange={(e) => setModelName(e.target.value)}
+  <div className="bg-white p-6 rounded-xl shadow-md">
+    <h3 className="text-lg font-semibold text-gray-700 mb-4">Product Info</h3>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <input placeholder="Product Name" className="border p-3 rounded-lg focus:ring-2 focus:ring-blue-400" value={name} onChange={e => setName(e.target.value)} />
+      <input placeholder="Price" className="border p-3 rounded-lg focus:ring-2 focus:ring-blue-400" value={Price} onChange={e => setPrice(e.target.value)} />
+      <input placeholder="Video URL" className="border p-3 rounded-lg focus:ring-2 focus:ring-blue-400" value={VideoURL} onChange={e => setVideoURL(e.target.value)} />
+      <input placeholder="Model Name" className="border p-3 rounded-lg focus:ring-2 focus:ring-blue-400" value={ModelName} onChange={e => setModelName(e.target.value)} />
+    </div>
+    <textarea
+      placeholder="Description"
+      className="w-full mt-4 border p-3 rounded-lg focus:ring-2 focus:ring-blue-400"
+      rows={4}
+      value={description}
+      onChange={e => setDescription(e.target.value)}
     />
   </div>
 
-  {/* Description */}
-  <textarea
-    className="w-full border p-2 rounded"
-    rows="3"
-    placeholder="Description"
-    value={description}
-    onChange={(e) => setdescription(e.target.value)}
-  />
+  {/* Models & Colors */}
+  <div className="bg-white p-6 rounded-xl shadow-md">
+    <h3 className="text-lg font-semibold text-gray-700 mb-4">Models & Colors</h3>
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <input placeholder="Model" className="border p-2 rounded-lg focus:ring-2 focus:ring-blue-400" value={ModleItem} onChange={e => setModleItem(e.target.value)} />
+      <input placeholder="Sub Price" className="border p-2 rounded-lg focus:ring-2 focus:ring-blue-400" value={subPrice} onChange={e => setSubPrice(e.target.value)} />
+      <button className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:scale-105 transition" onClick={addSubColour}>+ Add Color</button>
+    </div>
 
-  {/* Add Models */}
-  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
-    <input
-      className="border p-2 rounded"
-      placeholder="Model"
-      value={ModleItem}
-      onChange={(e) => setModleItem(e.target.value)}
-    />
-    <input
-      className="border p-2 rounded"
-      placeholder="Sub Price"
-      value={subPrice}
-      onChange={(e) => setsubPrice(e.target.value)}
-    />
-    <button
-      className="bg-blue-500 text-white w-[80px] py-2 text-[16px] rounded hover:bg-blue-600"
-      onClick={AddSubColour}
-    >
-      +
-    </button>
-
-    {Colours?.map((item, index) => (
-      <div key={index} className="flex relative items-center gap-3 mb-4">
-        {/* Label or Color Circle */}
-        {!item?.Color ? (
+    {Colours.map((c, i) => (
+      <div key={i} className="flex relative items-center gap-3 mb-4">
+        {!c.Color ? (
           <label
-            className="text-sm font-medium text-gray-700 cursor-pointer"
-            onClick={() => setActiveIndex(activeIndex === index ? null : index)}
+            className="cursor-pointer px-3 py-1 border rounded-lg bg-gray-100 hover:bg-gray-200"
+            onClick={() => setActiveIndex(activeIndex === i ? null : i)}
           >
             Choose Color
           </label>
         ) : (
           <div
-            className="w-10 h-10 rounded-full border shadow cursor-pointer"
-            style={{ backgroundColor: item?.Color }}
-            onClick={() => setActiveIndex(activeIndex === index ? null : index)}
-            title={item.Color}
+            className="w-10 h-10 rounded-full border cursor-pointer shadow-sm"
+            style={{ backgroundColor: c.Color }}
+            onClick={() => setActiveIndex(activeIndex === i ? null : i)}
           />
         )}
-
-        {/* Remove Button */}
-        <button onClick={() => handleColorRemove(index)} className="text-[red]">
+        <button onClick={() => removeColour(i)} className="text-red-600 text-lg">
           <CiCircleRemove />
         </button>
-
-        {/* Stock Input */}
         <input
-          className="border p-2 rounded"
           placeholder="Stock"
-          value={item.Stock || ""}
-          onChange={(e) => HandleStock(e.target.value, index)}
+          className="border p-2 rounded-lg w-24 focus:ring-2 focus:ring-blue-400"
+          value={c.Stock}
+          onChange={e => handleStockChange(e.target.value, i)}
         />
-
-        {/* Color Picker */}
-        {activeIndex === index && (
+        {activeIndex === i && (
           <div className="absolute top-12 z-50" ref={pickerRef}>
             <SketchPicker
-              color={item?.Color}
-              onChangeComplete={(color) => ColVal(color.hex, index)}
+              color={c.Color}
+              onChange={color => handleColorChange(color.hex, i)}
             />
           </div>
         )}
       </div>
     ))}
 
-    <button
-      onClick={handleAddModle}
-      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-    >
+    <button className="mt-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-lg shadow hover:scale-105 transition" onClick={addModel}>
       Add Model
     </button>
+
+    {/* Model List */}
+    <ul className="space-y-2 mt-6">
+      {addModle.map((m, i) => (
+        <li key={i} className="border p-3 flex items-center gap-3 rounded-lg shadow-sm bg-gray-50">
+          <span onClick={() => removeModel(i)} className="text-red-700 cursor-pointer">
+            <MdDeleteForever />
+          </span>
+          {m.NeedValue.map((item, j) => (
+            <div key={j} className="w-6 h-6 rounded-full border shadow-sm" style={{ backgroundColor: item.Color }}></div>
+          ))}
+          <div className="text-sm font-medium text-gray-700">
+            {ModelName}: {m.Model} {m.Price && `(${m.Price}৳)`}
+          </div>
+        </li>
+      ))}
+    </ul>
   </div>
 
-  <ul className="space-y-4 text-sm text-gray-700">
-    {Modles.map((m, i) => (
-      <li
-        key={i}
-        className="border cursor-pointer flex gap-2 items-center justify-between p-4 rounded-lg shadow-sm bg-white"
-      >
-        <span onClick={() => ModlesRemove(i)} className="text-red-700 text-[24px]">
-          <MdDeleteForever />
-        </span>
-
-        <div className="cursor-pointer font-semibold  text-[20px]  text-gray-800 hover:text-blue-600">
-          {ModelName} : {m.Model}
-        </div>
-        {m.Price && (
-          <div className="cursor-pointer flex gap-1 font-semibold items-center text-[20px]  text-gray-800 hover:text-blue-600">
-            <span>{m.Price}</span>
-            <span className="text-green-900 text-[24px] font-bold hover:text-green-700">৳</span>
-          </div>
-        )}
-
-        {m?.NeedValue?.map((item, idx) => (
-          <div key={idx} className="flex flex-wrap gap-2 mt-2">
-            <div className="flex items-center gap-2">
-              <div
-                className="w-7 h-7 border shadow-black/13 shadow-sm "
-                style={{ backgroundColor: item?.Color }}
-              />
-            </div>
-            <span className="cursor-pointer font-semibold items-center text-[20px]  text-gray-800 hover:text-blue-600">
-              Stock : {item?.Stock || "null"}
-            </span>
-          </div>
-        ))}
-      </li>
-    ))}
-  </ul>
-
-  {/* Category Selection */}
-  <div className="space-y-2">
+  {/* Categories */}
+  <div className="bg-white p-6 rounded-xl shadow-md space-y-6">
     <div>
-      <h4 className="font-semibold">Main Category</h4>
-      <div className="flex flex-wrap gap-2">
-        {Main_category.map((cat) => (
+      <h4 className="font-semibold text-gray-700 mb-2">Main Category</h4>
+      <div className="flex gap-2 flex-wrap">
+        {Main_category.map(cat => (
           <button
             key={cat.id}
-            onClick={() => {
-              setMainx_category(cat.id);
-              setMainx_category_value(cat.name);
-            }}
-            className={`px-3 py-1 rounded ${
-              Mainx_category === cat.id ? "bg-blue-600 text-white" : "bg-gray-200"
-            }`}
+            onClick={() => { setMainx_category(cat.id); setMainx_category_value(cat.name) }}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${Mainx_category === cat.id ? 'bg-blue-600 text-white shadow' : 'bg-gray-200 hover:bg-gray-300'}`}
           >
             {cat.name}
           </button>
@@ -373,60 +386,46 @@ const AddNewProdect = () => {
     </div>
 
     <div>
-      <h4 className="font-semibold">Sub Category</h4>
-      <div className="flex flex-wrap gap-2">
-        {sub_category
-          .filter((c) => c.Main_C_id === Mainx_category)
-          .map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => {
-                setsubx_category(cat.id);
-                setsubx_category_value(cat.name);
-              }}
-              className={`px-3 py-1 rounded ${
-                subx_category === cat.id ? "bg-blue-600 text-white" : "bg-gray-200"
-              }`}
-            >
-              {cat.name}
-            </button>
-          ))}
+      <h4 className="font-semibold text-gray-700 mb-2">Sub Category</h4>
+      <div className="flex gap-2 flex-wrap">
+        {sub_category.filter(c => c.Main_C_id === Mainx_category).map(cat => (
+          <button
+            key={cat.id}
+            onClick={() => { setSubx_category(cat.id); setSubx_category_value(cat.name) }}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${subx_category === cat.id ? 'bg-blue-600 text-white shadow' : 'bg-gray-200 hover:bg-gray-300'}`}
+          >
+            {cat.name}
+          </button>
+        ))}
       </div>
     </div>
 
     <div>
-      <h4 className="font-semibold">Sub Sub Category</h4>
-      <div className="flex flex-wrap gap-2">
-        {subs_category
-          .filter((c) => c.sub_C_id === subx_category)
-          .map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => {
-                setsubsx_category(cat.id);
-                setsubsx_category_value(cat.name);
-              }}
-              className={`px-3 py-1 rounded ${
-                subsx_category === cat.id ? "bg-blue-600 text-white" : "bg-gray-200"
-              }`}
-            >
-              {cat.name}
-            </button>
-          ))}
+      <h4 className="font-semibold text-gray-700 mb-2">Sub Sub Category</h4>
+      <div className="flex gap-2 flex-wrap">
+        {subs_category.filter(c => c.sub_C_id === subx_category).map(cat => (
+          <button
+            key={cat.id}
+            onClick={() => { setSubsx_category(cat.id); setsubsx_category_value(cat.name) }}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${subsx_category === cat.id ? 'bg-blue-600 text-white shadow' : 'bg-gray-200 hover:bg-gray-300'}`}
+          >
+            {cat.name}
+          </button>
+        ))}
       </div>
     </div>
   </div>
 
-  {/* Submit Button */}
+  {/* Submit */}
   <button
-    onClick={submit}
-    className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 text-lg font-semibold"
+    className="w-full bg-gradient-to-r from-green-600 to-emerald-700 text-white py-3 rounded-xl text-lg font-semibold shadow hover:scale-105 transition"
+    onClick={submitProduct}
   >
-    Submit Product
+    ✅ Submit Product
   </button>
 </div>
 
-  );
-};
+  )
+}
 
-export default AddNewProdect;
+export default AddNewProduct;

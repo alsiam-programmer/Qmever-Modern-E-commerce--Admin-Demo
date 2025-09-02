@@ -1,64 +1,156 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react';
 import AddNewProdect from '../componat/AddNewProdect';
 import { IoAddOutline } from "react-icons/io5";
-import Orders from '../componat/orders';
-import axios from 'axios';
+import OrdersProcessing from '../componat/OrdersProcessing';
 import { apiData } from '../AllDataModels/ordersApiD';
+
 const Home = () => {
-  let [AddNewProBoxShow, setAddNewProBoxShow] = useState(false)
-  let HandleAddNewProduct = () => {
-    setAddNewProBoxShow(!AddNewProBoxShow)
-  }
+  const [showAddNewProduct, setShowAddNewProduct] = useState(false);
+  const [isClosing, setIsClosing] = useState(false); // ✅ added
+  const [totalEarnings, setTotalEarnings] = useState(0);
+  const [totalQuantity, setTotalQuantity] = useState(0);
 
-  let [ items , setItems ] = useState('')
+  const data = useContext(apiData);
 
-  let data = useContext(apiData)
-
-  const S_E_system = () => {
-    let select = data.filter( item => item?.orderStatus?.orderStatus === "Delivered" )
-    
-    if (select.length) {
-      let AllP = select.flatMap(item => item.orderItem.map(orders => Number(orders.Price))).reduce((acc , price) => acc + price)
-      setItems(AllP)
-      
+  const handleAddNewProduct = () => {
+    if (showAddNewProduct) {
+      // start closing animation
+      setIsClosing(true);
+      setTimeout(() => {
+        setShowAddNewProduct(false);
+        setIsClosing(false); // reset
+      }, 500); // match your animation duration
     } else {
+      setShowAddNewProduct(true);
     }
-    
-  }
-  
-  useEffect(()=>{
-    S_E_system()
-  },[data])
-  
-  // console.log(items);
-  
+  };
+
+  // Calculate total earnings and quantity from Delivered orders
+  useEffect(() => {
+    if (data?.length) {
+      const deliveredOrders = data.filter(
+        order => order?.orderStatus?.orderStatus === "Delivered"
+      );
+
+      let earnings = 0;
+      let quantity = 0;
+
+      deliveredOrders.forEach(order => {
+        order.orderItem.forEach(item => {
+          if (item.cartItem) {
+            item.cartItem.forEach(cart => {
+              earnings += (Number(cart.Price) || 0) * (Number(cart.ProdectQun) || 1);
+              quantity += Number(cart.ProdectQun) || 0;
+            });
+          } else {
+            earnings += (Number(item.Price) || Number(item.Pricesub) || 0) * (Number(item.ProdectQun) || 1);
+            quantity += Number(item.ProdectQun) || 0;
+          }
+        });
+      });
+
+      setTotalEarnings(earnings);
+      setTotalQuantity(quantity);
+    }
+  }, [data]);
 
   return (
-    <>
-      <section>
-        <div className="container relative mx-auto">
-          <div className="mainDev my-[10px] flex gap-[10px] ">
-            <div className="left_Box p-[10px] px-[20px] bg-[#e5e2e2] w-[39%]">
-              <h5>Total Earning :{items}৳ </h5>
-              <h2>Tolal sell Item :</h2>
-            </div>
-            <div className="Right_Box p-[10px] px-[20px] bg-[#e5e2e2] w-[59%]">
-              <Orders/>
-            </div>
+<section className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 py-10">
+  <div className="container mx-auto px-4 relative">
+    <div className="flex flex-wrap gap-8">
+      
+      {/* Left Box - Advanced Earnings & Quantity */}
+      <div className="relative w-full md:w-[30%] p-8 rounded-3xl bg-gradient-to-br from-white/70 to-white/50 backdrop-blur-xl shadow-2xl border border-gray-200 transform transition-all duration-500">
+        
+        {/* Earnings */}
+        <div className="flex items-center gap-4 mb-8">
+          <div className="bg-green-100/60 p-4 rounded-2xl shadow-inner flex items-center justify-center">
+            <span className="text-green-600 text-2xl">💰</span>
           </div>
-          <h2 onClick={HandleAddNewProduct} className=' z-[999] fixed bottom-[30px] right-[30px] text-[green] h-[40px] w-[40px] bg-[#c7c7c7] rounded-[50%] text-[24px] flex justify-center items-center'><IoAddOutline /></h2>
-          {
-            AddNewProBoxShow !== false
-              ? <div className=" absolute w-[100%]  bg-[#fff] p-[30px] top-0 left-0">
-                <AddNewProdect />
-              </div>
-              : ""
-          }
-
+          <div>
+            <h5 className="text-lg font-semibold text-gray-700">Total Earnings</h5>
+            <p className="text-4xl font-extrabold text-green-600 tracking-tight">
+              {totalEarnings.toLocaleString()} ৳
+            </p>
+          </div>
         </div>
-      </section>
-    </>
-  )
-}
 
-export default Home
+        {/* Sold Items */}
+        <div className="flex items-center gap-4">
+          <div className="bg-blue-100/60 p-4 rounded-2xl shadow-inner flex items-center justify-center">
+            <span className="text-blue-600 text-2xl">📦</span>
+          </div>
+          <div>
+            <h5 className="text-lg font-semibold text-gray-700">Total Sold Items</h5>
+            <p className="text-3xl font-bold text-gray-900">
+              {totalQuantity}
+            </p>
+          </div>
+        </div>
+
+        {/* Decorative floating elements */}
+        <div className="absolute top-0 right-0 w-24 h-24 bg-green-200/30 rounded-full blur-3xl pointer-events-none animate-pulse-slow"></div>
+        <div className="absolute bottom-4 left-0 w-16 h-16 bg-blue-200/30 rounded-full blur-2xl pointer-events-none animate-pulse-slow"></div>
+      </div>
+
+      {/* Right Box - Orders */}
+      <div className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-xl w-full md:flex-1 border border-gray-100">
+        <h5 className="text-lg font-semibold mb-6 text-gray-700 flex items-center gap-2">
+          🛒 Orders
+        </h5>
+        <div className="animate-fade-in">
+          <OrdersProcessing />
+        </div>
+      </div>
+    </div>
+
+    {/* Floating Add New Product Button */}
+    <button
+      onClick={handleAddNewProduct}
+      className="fixed bottom-8 right-8 z-50 h-16 w-16 bg-gradient-to-tr from-green-500 to-emerald-600 
+                 text-white rounded-full flex items-center justify-center shadow-2xl 
+                 hover:scale-110 hover:rotate-6 transition-transform duration-300 ease-out"
+    >
+      <IoAddOutline size={30} />
+    </button>
+
+    {/* Add New Product Panel (Slide-in with Overlay) */}
+    {showAddNewProduct && (
+      <div className="fixed inset-0 z-40 flex justify-end">
+        {/* Overlay */}
+        <div
+          className={`absolute inset-0 bg-black/50 backdrop-blur-sm ${
+            isClosing ? "animate-fade-out" : "animate-fade-in"
+          }`}
+          onClick={handleAddNewProduct}
+        />
+
+        {/* Panel */}
+        <div
+          className={`relative w-full max-w-4xl h-full bg-white rounded-l-2xl shadow-2xl 
+                      overflow-y-auto p-8 ${
+                        isClosing ? "animate-slide-out-right" : "animate-slide-in-right"
+                      }`}
+        >
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+              ➕ Add New Product
+            </h3>
+            <button
+              onClick={handleAddNewProduct}
+              className="text-gray-500 hover:text-gray-800 text-3xl font-bold leading-none"
+            >
+              ×
+            </button>
+          </div>
+          <AddNewProdect />
+        </div>
+      </div>
+    )}
+  </div>
+</section>
+
+  );
+};
+
+export default Home;
