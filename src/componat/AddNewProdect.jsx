@@ -3,7 +3,8 @@ import { getDatabase, ref, set, push } from "firebase/database";
 import { SketchPicker } from 'react-color';
 import { CiCircleRemove } from "react-icons/ci";
 import { MdDeleteForever } from "react-icons/md";
-
+import { RiAddBoxLine } from "react-icons/ri";
+import { VscDiffRemoved } from "react-icons/vsc";
 const AddNewProduct = () => {
   const db = getDatabase();
   const pickerRef = useRef(null);
@@ -29,7 +30,10 @@ const AddNewProduct = () => {
   const [subPrice, setSubPrice] = useState('');
   const [Colours, setColours] = useState([{ Color: '', Stock: '' }]);
   const [activeIndex, setActiveIndex] = useState(null);
-
+  const [SpecificationValue , setSpecificationValue] = useState([])
+  const [SpecificationValuefastinput , setSpecificationValuefastinput] = useState("")
+  const [SpecificationValuesecoendinput , setSpecificationValuesecoendinput] = useState("")
+  const [SBONOFF , setSBONOFF] = useState(false)
   
 
   // --- Category Data ---
@@ -204,10 +208,12 @@ const subs_category = [
       Price,
       category: { main: Mainx_category_value, sub: subx_category_value, subs: subsx_category_value },
       description,
+      SpecificationValue,
       uid,
       ModelName,
       VideoURL,
       addModle,
+      thumbnail,
     }).then(() => {
       // Reset
       alert('send')
@@ -228,6 +234,16 @@ const subs_category = [
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+
+  const SpecificationHandle = () => {   
+    if (SpecificationValuefastinput !== "" && SpecificationValuesecoendinput !== "") {
+    setSpecificationValue( prev => [...prev , { First : SpecificationValuefastinput , Second: SpecificationValuesecoendinput }] )
+    setSpecificationValuefastinput('')
+    setSpecificationValuesecoendinput('')
+    }
+
+  }
 
   return (
 <div className="p-8 w-[95%] max-w-6xl min-h-screen mx-auto space-y-8 bg-gradient-to-br from-gray-50 to-white shadow-xl rounded-2xl">
@@ -367,6 +383,63 @@ const subs_category = [
       ))}
     </ul>
   </div>
+
+<div className="bg-white p-6 rounded-xl shadow-md space-y-4">
+  {/* Toggle Button */}
+<span
+  onClick={() => setSBONOFF(!SBONOFF)}
+  className="flex items-center justify-between w-full px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md cursor-pointer hover:from-blue-600 hover:to-indigo-700 transition"
+>
+  <span>Specification Box</span>
+  <span className=' text-[20px]' >{ SBONOFF ? <VscDiffRemoved /> : <RiAddBoxLine/>}</span>
+
+</span>
+
+  {/* Input + List Section */}
+  {SBONOFF && (
+    <>
+      {/* Input Section */}
+      <div className="flex items-center gap-3">
+        <input
+          onChange={(e) => setSpecificationValuefastinput(e.target.value)}
+          type="text"
+          value={SpecificationValuefastinput}
+          placeholder="First input"
+          className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <input
+          onChange={(e) => setSpecificationValuesecoendinput(e.target.value)}
+          type="text"
+          value={SpecificationValuesecoendinput}
+          placeholder="Second input"
+          className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          onClick={SpecificationHandle}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          Add
+        </button>
+      </div>
+
+      {/* List Section */}
+      <div className="space-y-2">
+        {SpecificationValue.map((item, index) => (
+          <div
+            key={index}
+            className="flex justify-between items-center p-3 border rounded-lg bg-gray-50 hover:bg-gray-100 transition"
+          >
+            <span className="font-medium text-gray-800">{item.First}</span>
+            <span className="text-gray-600">{item.Second}</span>
+          </div>
+        ))}
+      </div>
+    </>
+  )}
+</div>
+
+
+
 
   {/* Categories */}
   <div className="bg-white p-6 rounded-xl shadow-md space-y-6">
